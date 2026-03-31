@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>随机宠物生成器</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f5f5f5;
+    padding: 40px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+img {
+    width: 400px;
+    height: auto;
+    border-radius: 12px;
+    transition: opacity 0.5s;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #333;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #555;
+}
+
+#status {
+    margin: 15px;
+    font-size: 14px;
+    color: #666;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🐶🐱 随机宠物生成器</h1>
+
+<div>
+    <button onclick="setMode('dog')">只看狗狗</button>
+    <button onclick="setMode('cat')">只看猫咪</button>
+    <button onclick="setMode('random')">随机</button>
+</div>
+
+<br>
+
+<img id="petImage" src="" alt="宠物图片">
+
+<div id="status">点击按钮开始</div>
+
+<br>
+
+<button onclick="getPet()">换一张</button>
+
+<script>
+let mode = "random";
+
+function setMode(newMode) {
+    mode = newMode;
+    getPet();
+}
+
+async function getPet() {
+    const img = document.getElementById("petImage");
+    const status = document.getElementById("status");
+
+    img.style.opacity = 0;
+
+    status.innerText = "加载中... 🐾";
+
+    try {
+        let url;
+
+        if (mode === "dog") {
+            url = "https://dog.ceo/api/breeds/image/random";
+        } else if (mode === "cat") {
+            url = "https://api.thecatapi.com/v1/images/search";
+        } else {
+            url = Math.random() > 0.5
+                ? "https://dog.ceo/api/breeds/image/random"
+                : "https://api.thecatapi.com/v1/images/search";
+        }
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        let imageUrl;
+
+        if (mode === "cat" || (mode === "random" && data[0])) {
+            imageUrl = data[0].url;
+            status.innerText = "喵喵加载完成 🐱";
+        } else {
+            imageUrl = data.message;
+            status.innerText = "汪汪加载完成 🐶";
+        }
+
+        img.src = imageUrl;
+
+        setTimeout(() => {
+            img.style.opacity = 1;
+        }, 100);
+
+    } catch (err) {
+        status.innerText = "加载失败，请重试 😢";
+    }
+}
+</script>
+
+</body>
+</html>
